@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+	  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  		
+<mapper namespace = "com.oneteam.guardSanctuary.persistence.ClientDAO">
+	
+	<insert id = "insertClient" parameterType = "com.oneteam.guardSanctuary.vo.ClientVO">
+		
+	</insert>
+	
+	<!-- 광회, 이메일 인증키 조회 -->
+	<select id = "selectKey" resultType = "int">
+		SELECT COUNT(*) FROM client WHERE m_key = #{key}
+	</select>
+	
+	<!-- 광회, 이메일 인증 완료 -->
+	<update id = "updateGrade" parameterType="String">
+		UPDATE client SET enabled=1 WHERE m_key = #{key}
+	</update>
+		
+	<!-- 광회, 시큐리티 로그인, 회원 아이디 중복 확인 -->
+	<!-- UserLoginFailureHandler에서 호출 -->
+	<select id = "idCheck" parameterType = "String" resultType = "int">
+		SELECT COUNT(*) FROM client WHERE id = #{strId}
+	</select>
+	
+	<!-- 광회, 시큐리티 로그인 -->
+	<!-- UserLoginFailureHandler에서 호출 -->
+	<select id = "pwdCheck" resultType = "String">
+		SELECT pwd FROM client WHERE id = #{strId}
+	</select>
+	
+	<select id = "idPwdChk" parameterType = "java.util.Map" resultType = "int">
+		SELECT COUNT(*) FROM client WHERE id=#{strId} AND pwd=#{strPwd}
+	</select>
+	
+	<delete id = "deleteClient" parameterType = "String">
+		DELETE client WHERE id=#{strId}
+	</delete>
+	
+	<!-- 광회, 수정 예정 -->
+	<!-- UserAuthenticationService에서도 시큐리티 DB조회를 위해 호출 -->
+	<!-- 시큐리티 로그인 검증을 위해 최소 id, pwd, enabled, authority 값을 갖고와야 한다.  -->
+		<!-- 광회, 회원 로그인 -->
+	<!-- UserAuthenticationService에서도 시큐리티 DB조회를 위해 호출 -->
+	<!-- 시큐리티 로그인 검증을 위해 최소 id, pwd, enabled, authority 값을 갖고와야 한다.  -->
+	<select id = "getClientInfo" parameterType = "String" resultType = "com.oneteam.guardSanctuary.vo.EmpVO">
+		SELECT id, 
+		       pwd,
+		       name,
+		       email,
+		       phone,
+		       address,
+		       authority,
+		       enabled,
+		       m_key
+		  FROM client 
+		 WHERE id=#{strId}
+	</select>	
+	
+	<update id = "updateClient" parameterType = "com.oneteam.guardSanctuary.vo.ClientVO">
+		UPDATE client
+		   SET pwd=#{pwd}, 
+		       name=#{name}, 
+		       phone=#{phone}, 
+		       email=#{email}, 
+		       zipcode=#{zipcode}, 
+		       address=#{address} 
+		 WHERE id=#{id}
+	</update>
+	
+	<select id = "getClientCnt" parameterType = "String" resultType = "int">
+		SELECT COUNT(*) as cnt FROM client WHERE id != #{hostId}
+	</select>
+	
+	<select id="viewClientList" parameterType = "java.util.Map" resultType = "com.oneteam.guardSanctuary.vo.ClientVO">
+		<![CDATA[	
+			SELECT * 
+			  FROM (SELECT id, 
+			               pwd, 
+			               name, 
+			               email, 
+			               phone, 
+			               address, 
+			               joindate, 
+			               birth, 
+			               zipcode, 
+			               ROWNUM rNum 
+			          FROM client)
+			 WHERE rNum >= #{start} AND rNum <= #{end} AND id != #{hostId}
+			 ORDER BY rNum
+		]]>
+	</select>
+	
+	<select id = "getSearchClientCnt" parameterType = "java.util.Map" resultType = "int">
+		SELECT COUNT(*) as cnt FROM client WHERE id LIKE #{searchClientName} AND id != #{hostId}
+	</select>
+	
+	<select id = "searchClientList" parameterType = "java.util.Map" resultType = "com.oneteam.guardSanctuary.vo.ClientVO">
+		<![CDATA[
+			
+		]]>
+	</select>
+	
+	<!-- 광회, 시큐리티 회원 등급 체크 -->
+	<!-- UserLoginSuccessHandler에서 호출 authentication.getName()이 #{id}로 대입-->
+	<select id = "gradeCheck" resultType = "String">
+		SELECT authority FROM client WHERE id = #{id}
+	</select>
+	
+</mapper>

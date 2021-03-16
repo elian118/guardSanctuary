@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+	  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  		
+<mapper namespace = "com.oneteam.guardSanctuary.persistence.EmpDAO">
+	
+	<insert id = "insertEmp" parameterType = "com.oneteam.guardSanctuary.vo.EmpVO">
+		INSERT INTO employee(emp_no, emp_id, emp_pwd, emp_name, emp_dept, emp_position, sal_code, emp_bank, emp_account, emp_m_key, emp_email, emp_phone, emp_address, emp_reg_date) 
+		VALUES(emp_seq.NEXTVAL, #{id}, #{pwd}, #{name}, #{dept}, #{position}, #{salCode}, #{bank}, #{account}, #{m_key}, #{email}, #{phone}, #{address}, #{hireDate})
+	</insert>
+	
+	<!-- 광회, 이메일 인증키 조회 -->
+	<select id = "selectKey" resultType = "int">
+		SELECT COUNT(*) FROM employee WHERE emp_m_key = #{key}
+	</select>
+	
+	<!-- 광회, 이메일 인증 완료 -->
+	<update id = "updateGrade" parameterType="String">
+		UPDATE employee SET emp_enabled=1 WHERE emp_m_key = #{key}
+	</update>
+		
+	<!-- 광회, 시큐리티 사원 아이디 중복확인 -->
+	<!-- UserLoginFailureHandler에서 호출 -->
+	<select id = "idCheck" parameterType = "String" resultType = "int">
+		SELECT COUNT(*) FROM employee WHERE emp_id = #{strId}
+	</select>
+	
+	<!-- 광회, 시큐리티 로그인 -->
+	<!-- UserLoginFailureHandler에서 호출 -->
+	<select id = "pwdCheck" resultType = "String">
+		SELECT emp_pwd pwd FROM employee WHERE emp_id = #{strId}
+	</select>
+	
+	<select id = "idPwdChk" parameterType = "java.util.Map" resultType = "int">
+		SELECT COUNT(*) FROM client WHERE id=#{strId} AND pwd=#{strPwd}
+	</select>
+	
+	<delete id = "deleteClient" parameterType = "String">
+		DELETE client WHERE id=#{strId}
+	</delete>
+	
+	<!-- 광회, 직원 로그인 -->
+	<!-- UserAuthenticationService에서도 시큐리티 DB조회를 위해 호출 -->
+	<!-- 시큐리티 로그인 검증을 위해 최소 id, pwd, enabled, authority 값을 갖고와야 한다.  -->
+	<select id = "getEmpInfo" parameterType = "String" resultType = "com.oneteam.guardSanctuary.vo.EmpVO">
+		SELECT emp_id id, 
+		       emp_pwd pwd,
+		       emp_name name,
+		       emp_authority authority,
+		       emp_enabled enabled,
+		       emp_m_key m_key,
+		       emp_email email,
+		       emp_phone phone,
+		       emp_address address
+		  FROM employee 
+		 WHERE emp_id=#{strId}
+	</select>
+	<update id = "updateClient" parameterType = "com.oneteam.guardSanctuary.vo.ClientVO">
+		UPDATE client
+		   SET pwd=#{pwd}, 
+		       name=#{name}, 
+		       phone=#{phone}, 
+		       email=#{email}, 
+		       zipcode=#{zipcode}, 
+		       address=#{address} 
+		 WHERE id=#{id}
+	</update>
+	
+	<select id = "getClientCnt" parameterType = "String" resultType = "int">
+		SELECT COUNT(*) as cnt FROM client WHERE id != #{hostId}
+	</select>
+	
+	<select id="viewClientList" parameterType = "java.util.Map" resultType = "com.oneteam.guardSanctuary.vo.ClientVO">
+		<![CDATA[	
+			SELECT * 
+			  FROM (SELECT id, 
+			               pwd, 
+			               name, 
+			               email, 
+			               phone, 
+			               address, 
+			               joindate, 
+			               birth, 
+			               zipcode, 
+			               ROWNUM rNum 
+			          FROM client)
+			 WHERE rNum >= #{start} AND rNum <= #{end} AND id != #{hostId}
+			 ORDER BY rNum
+		]]>
+	</select>
+	
+	<select id = "getSearchClientCnt" parameterType = "java.util.Map" resultType = "int">
+		SELECT COUNT(*) as cnt FROM client WHERE id LIKE #{searchClientName} AND id != #{hostId}
+	</select>
+	
+	<select id = "searchClientList" parameterType = "java.util.Map" resultType = "com.oneteam.guardSanctuary.vo.ClientVO">
+		<![CDATA[
+			
+		]]>
+	</select>
+	
+	<!-- 광회, 시큐리티 회원 등급 체크 -->
+	<!-- UserLoginSuccessHandler에서 호출 authentication.getName()이 #{id}로 대입-->
+	<select id = "gradeCheck" resultType = "String">
+		SELECT emp_authority authority FROM employee WHERE emp_id = #{id}
+	</select>
+	
+</mapper>
