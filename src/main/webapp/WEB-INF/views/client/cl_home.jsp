@@ -11,6 +11,6 @@
 		<div class = "container">
 			로그인 성공
 		</div>
-	<%@ include file = "../common/footer.jsp" %>
+	<%@ include file = "./cl_footer.jsp" %>
 </body>
 </html>

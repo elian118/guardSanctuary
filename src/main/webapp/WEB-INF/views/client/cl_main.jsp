@@ -15,6 +15,6 @@
 		</script>
 	</c:if>
 <%@ include file = "cl_index.jsp" %>
-<%@ include file = "../common/footer.jsp" %>
+<%@ include file = "./cl_footer.jsp" %>
 </body>
 </html>

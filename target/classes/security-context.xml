@@ -43,7 +43,7 @@
 		
 		<!-- 접근 권한이 없는 경우의 코드 -->
 		<sec:access-denied-handler ref="userDeniedHandler" />
-		<sec:logout logout-url="/logout.do" logout-success-url = "/main.do" />	<!-- 시큐리티가 제공하는 로그아웃 페이지로 이동 -->
+		<sec:logout logout-url="/logout.do" logout-success-url = "/cl_main.do" />	<!-- 시큐리티가 제공하는 로그아웃 페이지로 이동 -->
 	</sec:http>
 	
 	<bean id = "userLoginSuccessHandler" class = "com.oneteam.guardSanctuary.service.UserLoginSuccessHandler" >
