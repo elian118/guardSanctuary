@@ -15,7 +15,6 @@ import com.oneteam.guardSanctuary.service.EmpServiceImpl;
 @Controller
 public class SanctuaryController {
 	
-	// 홍
 	private static final Logger logger = LoggerFactory.getLogger(SanctuaryController.class);
 	
 	@Autowired
