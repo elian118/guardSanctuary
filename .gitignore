@@ -1,0 +1,14 @@
+*.properties
+
+### Java ###
+# Compiled class file
+*.class
+.classpath
+.project
+.metadata
+.settings/
+
+# Log file
+*.log
+
+target/
